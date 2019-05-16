@@ -9,11 +9,9 @@ import threading
 
 # Source http://blog.blitzblit.com/2017/12/24/asynchronous-video-capture-in-python-with-opencv/
 class VideoCaptureAsync:
-    def __init__(self, src=0, width=640, height=480):
+    def __init__(self, src=0):
         self.src = src
         self.cap = cv2.VideoCapture(self.src)
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
         self.grabbed, self.frame = self.cap.read()
         self.started = False
         self.read_lock = threading.Lock()
