@@ -21,7 +21,7 @@ cv2.namedWindow("Frame", cv2.WINDOW_NORMAL)
 class faceObject:
     'Classe de base para rastrear faces'
 
-    history_size_max = 5
+    history_size_max = 25
 
     def __init__(self, rect):
         self.history = list()
@@ -82,13 +82,11 @@ class faceTracker:
         deleteKeyList = list()
         # Associa cada face do registro a alguma(s) face(s) do frame
         for faceID in self.faceDict:
-            # TODO problema quando detecta o olho e nao o rosto
             equalFaces = [ key for key in frameFacesDict if self.faceDict[faceID] == frameFacesDict[key] ]
-            print(len(equalFaces))
             if len(equalFaces) == 0:
                 # A face eh considerada perdida caso nao tenha ninguem para associar
                 self.faceMissingCounter[faceID] = self.faceMissingCounter[faceID] + 1
-                if self.faceMissingCounter[faceID] > faceTracker.missingMax:
+                if self.faceMissingCounter[faceID] > faceTracker.missingMax or self.faceMissingCounter[faceID] > 2*len(self.faceDict[faceID].history):
                     deleteKeyList.append(faceID)
             else:
                 self.faceMissingCounter[faceID] = 0
@@ -97,7 +95,15 @@ class faceTracker:
                 for key in equalFaces:
                     if abs(self.faceDict[faceID].radius - frameFacesDict[key].radius) < abs(self.faceDict[faceID].radius - frameFacesDict[closest].radius):
                         closest = key
-                self.faceDict[faceID].update(frameFacesDict[closest])
+                
+                trig_distance = 0.5
+                if frameFacesDict[closest].radius < trig_distance*self.faceDict[faceID].radius:
+                    # Raio muito menor, possivel falso positivo
+                    self.faceMissingCounter[faceID] = self.faceMissingCounter[faceID] + 1
+                    if self.faceMissingCounter[faceID] > faceTracker.missingMax:
+                        deleteKeyList.append(faceID)
+                else:
+                    self.faceDict[faceID].update(frameFacesDict[closest])
                 # Remove todas as faces "iguais" do dicionario de faces do frame
                 for key in equalFaces:
                     del frameFacesDict[key]
@@ -105,6 +111,7 @@ class faceTracker:
         for key in deleteKeyList:
             del self.faceDict[key]
             del self.faceMissingCounter[key]
+
         # Para as faces do frame restantes, acrescentar no registro
         for newFaceID in frameFacesDict:
             self.faceDict[self.faceIDCounter] = copy.deepcopy(frameFacesDict[newFaceID])
