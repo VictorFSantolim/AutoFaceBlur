@@ -69,6 +69,7 @@ class faceTracker:
             if len(equalFaces) == 0:
                 # A face eh considerada perdida caso nao tenha ninguem para associar
                 self.faceMissingCounter[faceID] = self.faceMissingCounter[faceID] + 1
+                regFace.radius = 1.01*regFace.radius
                 if self.faceMissingCounter[faceID] > faceTracker.missingMax or self.faceMissingCounter[faceID] > 2*len(regFace.history):
                     deleteKeyList.append(faceID)
             else:
@@ -82,6 +83,7 @@ class faceTracker:
                 if frameFacesDict[closest].radius < trig_distance*regFace.radius:
                     # Raio muito menor, possivel falso positivo
                     self.faceMissingCounter[faceID] = self.faceMissingCounter[faceID] + 1
+                    regFace.radius = 1.01*regFace.radius
                     if self.faceMissingCounter[faceID] > faceTracker.missingMax:
                         deleteKeyList.append(faceID)
                 else:
