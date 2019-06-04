@@ -4,7 +4,7 @@ import copy
 class faceObject:
     'Classe de base para rastrear faces'
 
-    history_size_max = 25
+    history_size_max = 50
 
     def __init__(self, rect):
         self.history = list()
@@ -17,8 +17,10 @@ class faceObject:
         # Atualiza o centro para a nova face
         self.center = aface.center
         # O novo raio eh a media do raio antigo e do raio da nova face
-        keep_radius = 0.5
-        self.radius = keep_radius*self.radius + (1.0-keep_radius)*aface.radius
+        keep_radius = 0.64
+        greater_radius = max(self.radius, aface.radius)
+        minor_radius = min(self.radius, aface.radius)
+        self.radius = keep_radius*greater_radius + (1.0-keep_radius)*minor_radius
         self.history.append(self.center)
         if len(self.history) > faceObject.history_size_max:
             self.history.pop(0)
@@ -69,7 +71,6 @@ class faceTracker:
             if len(equalFaces) == 0:
                 # A face eh considerada perdida caso nao tenha ninguem para associar
                 self.faceMissingCounter[faceID] = self.faceMissingCounter[faceID] + 1
-                regFace.radius = 1.01*regFace.radius
                 if self.faceMissingCounter[faceID] > faceTracker.missingMax or self.faceMissingCounter[faceID] > 2*len(regFace.history):
                     deleteKeyList.append(faceID)
             else:
@@ -83,7 +84,6 @@ class faceTracker:
                 if frameFacesDict[closest].radius < trig_distance*regFace.radius:
                     # Raio muito menor, possivel falso positivo
                     self.faceMissingCounter[faceID] = self.faceMissingCounter[faceID] + 1
-                    regFace.radius = 1.01*regFace.radius
                     if self.faceMissingCounter[faceID] > faceTracker.missingMax:
                         deleteKeyList.append(faceID)
                 else:
@@ -107,12 +107,15 @@ class faceTracker:
         frameFacesDict.clear()
         del frameFacesDict
     
-    def getFaces(self):
+    def getFaces(self, framerate = 30.0):
         # Cria uma lista de retangulos que representam as faces
         faceList = list()
         for faceID in self.faceDict:
             if self.faceMissingCounter[faceID] > 0:
-                faceList.append(self.faceDict[faceID].getpredictrect(self.faceMissingCounter[faceID]))
+                framerate_div = framerate/30.0
+                
+                self.faceDict[faceID].radius = (1.005)*self.faceDict[faceID].radius
+                faceList.append(self.faceDict[faceID].getpredictrect(self.faceMissingCounter[faceID]/framerate_div))
             else:
                 faceList.append(self.faceDict[faceID].getrect())
         return faceList

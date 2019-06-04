@@ -13,10 +13,13 @@ from tracker import faceTracker
 cap = cv2.VideoCapture(0)
 #Importa os modelos xml dos cascades
 frontal_face_cascade = cv2.CascadeClassifier("cascades/haarcascade_frontalface_default.xml")
+#frontal_face_cascade = cv2.CascadeClassifier("cascades/myCascade2.xml")
 
 cv2.namedWindow("Frame", cv2.WINDOW_NORMAL)
 
 tracker = faceTracker()
+
+fps = 30.0
 
 while True:
     #Conta o tempo de inicio do ciclo
@@ -35,20 +38,21 @@ while True:
         frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
         face = faceObject(rect)
         frameFacesList.append(face)
-        #(x, y, w, h) = face.getrect()
-        #sub_frame = cv2.GaussianBlur(frame[y:(y+h), x:(x+w)], (27, 27), 30)
-        #frame[y:(y+h), x:(x+w)] = sub_frame
-        #frame = cv2.circle(frame, face.center, 1, (0, 0, 255), 2)
-        #sub_frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
-        #del face
+
     
     tracker.update(frameFacesList)
-    registryFacesList = tracker.getFaces()
+    registryFacesList = tracker.getFaces(framerate=fps)
 
     for rect in registryFacesList:
         (x, y, w, h) = rect
+        if x < 0:
+            x = 0
+        if y < 0:
+            y = 0
         frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
-    
+        sub_frame = cv2.GaussianBlur(frame[y:(y+h), x:(x+w)], (27, 27), 30)
+        frame[y:(y+h), x:(x+w)] = sub_frame
+
     del frameFacesList
     del registryFacesList
 
