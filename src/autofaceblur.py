@@ -35,7 +35,7 @@ while True:
 
     for rect in front_faces:
         (x, y, w, h) = rect
-        frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        #frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
         face = faceObject(rect)
         frameFacesList.append(face)
 
@@ -49,8 +49,10 @@ while True:
             x = 0
         if y < 0:
             y = 0
-        frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
-        sub_frame = cv2.GaussianBlur(frame[y:(y+h), x:(x+w)], (27, 27), 30)
+        #frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
+        # Variable kernel size (odd number)
+        ksize = 2*int(0.15*max(w, h)) + 1
+        sub_frame = cv2.GaussianBlur(frame[y:(y+h), x:(x+w)], (ksize, ksize), sigmaX=20)
         frame[y:(y+h), x:(x+w)] = sub_frame
 
     del frameFacesList
