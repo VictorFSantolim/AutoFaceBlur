@@ -63,16 +63,14 @@ def mainLoop(video_source, cascade_source, show_processing=True, output_file=Non
     # Initilizes video_writer
     video_out_writer = None
     if output_file is not None:
-        video_out_writer = cv2.VideoWriter('outpy.avi',cv2.VideoWriter_fourcc('M','J','P','G'), fps, (frame_width,frame_height))
+        video_out_writer = cv2.VideoWriter(output_file, \
+                cv2.VideoWriter_fourcc('M','J','P','G'), fps, (frame_width,frame_height))
 
-    ret = True
+    # Timing start
+    time_start = time.time()
+    # Reads a frame
+    ret , frame = cap.read()
     while ret:
-        # Timing start
-        time_start = time.time()
-
-        # Reads a frame
-        ret , frame = cap.read()
-
         # Makes the frame gray scale (used for haar processing)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
@@ -113,10 +111,13 @@ def mainLoop(video_source, cascade_source, show_processing=True, output_file=Non
         calculated_fps = 1/(time_end - time_start)
 
         # Saves the video
-        if output_file is not None:
+        if video_out_writer is not None:
             if save_fps:
                 out_frame = frame.copy()
-                cv2.putText(out_frame, str(calculated_fps) ,(10,30), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(255,0,255),2,cv2.LINE_AA)
+                if variable_fps:
+                    cv2.putText(out_frame, str(calculated_fps) ,(10,30), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(255,0,255),2,cv2.LINE_AA)
+                else:
+                    cv2.putText(out_frame, str(fps) ,(10,30), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(255,0,255),2,cv2.LINE_AA)
                 video_out_writer.write(out_frame)
             else:
                 video_out_writer.write(frame)
@@ -130,15 +131,47 @@ def mainLoop(video_source, cascade_source, show_processing=True, output_file=Non
             # Shows the frame with detected faces
             cv2.imshow("Frame", frame)
 
-            # If Esc(= key 27) is pressed closes the window and stops processing.
+            # If Esc(= key 27) is pressed close the window and stops processing.
             key = cv2.waitKey(1)
             if key == 27:
                 break
+        
+        # Timing start
+        time_start = time.time()
+        # Reads a new frame
+        ret , frame = cap.read()
 
     # Releases the capture and closes the spawned windows
     cap.release()
     if show_processing:
         cv2.destroyAllWindows()
+    if video_out_writer is not None:
+        video_out_writer.release()
 
 if __name__ == "__main__":
-    mainLoop(0, "cascades/haarcascade_frontalface_default.xml")
+    # Lida com os argumentos da linha de comando
+    parser = argparse.ArgumentParser(description="""Processes a video from a camera \
+            source or video file source, blurs a detected object in the image using \
+            a trained Haar cascade classifier while tracking that object to make sure \
+            all the frames are properly blurred.""")
+
+    input_group = parser.add_mutually_exclusive_group(required=True)
+    input_group.add_argument("-c", "--camera", help="Integer representing the camera souce index", type=int, default=None)
+    input_group.add_argument("-v", "--video", help="Path to the video file that will be processed.", type=str, default=None)
+
+    parser.add_argument("cascade_source", help="Path to the trained haar cascade classifier source file.", type=str)
+    parser.add_argument("-o", "--output_file", help="Path where the processed video file will be stored.", type=str, default=None)
+    parser.add_argument("-p", "--hide_processing", help="Shows a window while processing the video.", action="store_false")
+    parser.add_argument("--variable_fps", help="Takes into account the processing time of the frame\
+            to track the object, only recommended for camera input.", action="store_true")
+    parser.add_argument("--show_fps", help="Shows fps in the a window while processing the video.", action="store_true")
+    parser.add_argument("--save_fps", help="Saves the video fps as it was captured to the video output_file.", action="store_true")
+
+    args = parser.parse_args()
+
+    mainLoop(args.video if args.video else args.camera,\
+            args.cascade_source,\
+            show_processing=args.hide_processing,\
+            output_file=args.output_file,\
+            variable_fps=args.variable_fps,\
+            save_fps=args.save_fps, show_fps=args.show_fps)
