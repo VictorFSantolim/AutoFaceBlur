@@ -16,7 +16,7 @@ from tracker import faceObject
 from tracker import faceTracker
 
 def mainLoop(video_source, cascade_source, show_processing=True, output_file=None, \
-        variable_fps=False, save_fps=False, show_fps=True):
+        variable_fps=False, save_fps=False, show_fps=True, save_img=False):
     """Main blur processing loop.
     Does the processing in real time, from a cam source, or from a video source,
     identifying an object, tracking it, blurring it, and optionally saving the
@@ -64,10 +64,12 @@ def mainLoop(video_source, cascade_source, show_processing=True, output_file=Non
     cascade_classifier = cv2.CascadeClassifier("cascades/haarcascade_frontalface_default.xml")
 
     # Initilizes video_writer
-    video_out_writer = None
+    frame_out_writer = None
     if output_file is not None:
-        video_out_writer = cv2.VideoWriter(output_file, \
-                cv2.VideoWriter_fourcc('M','J','P','G'), fps, (frame_width,frame_height))
+        if not save_img:
+            frame_out_writer = cv2.VideoWriter(output_file, \
+                    cv2.VideoWriter_fourcc('M','J','P','G'), \
+                    fps, (frame_width,frame_height))
 
     # Timing start
     time_start = time.time()
@@ -113,16 +115,19 @@ def mainLoop(video_source, cascade_source, show_processing=True, output_file=Non
         calculated_fps = 1/(time_end - time_start)
 
         # Saves the video
-        if video_out_writer is not None:
+        if frame_out_writer is not None:
             if save_fps:
                 out_frame = frame.copy()
                 if variable_fps:
                     cv2.putText(out_frame, str(calculated_fps) ,(10,30), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(255,0,255),2,cv2.LINE_AA)
                 else:
                     cv2.putText(out_frame, str(fps) ,(10,30), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(255,0,255),2,cv2.LINE_AA)
-                video_out_writer.write(out_frame)
+                frame_out_writer.write(out_frame)
             else:
-                video_out_writer.write(frame)
+                frame_out_writer.write(frame)
+        elif save_img:
+            cv2.imwrite(output_file, frame)
+            ret = False
 
         # Shows while processing
         if show_processing:
@@ -147,22 +152,25 @@ def mainLoop(video_source, cascade_source, show_processing=True, output_file=Non
     cap.release()
     if show_processing:
         cv2.destroyAllWindows()
-    if video_out_writer is not None:
-        video_out_writer.release()
+    if frame_out_writer is not None:
+        frame_out_writer.release()
 
 if __name__ == "__main__":
     # Lida com os argumentos da linha de comando
     parser = argparse.ArgumentParser(description="""Processes a video from a camera \
             source or video file source, blurs a detected object in the image using \
             a trained Haar cascade classifier while tracking that object to make sure \
-            all the frames are properly blurred.""")
+            all the frames are properly blurred. Note that if the input is passed as \
+            a video or camera source the output will be a video, if it is an image the \
+            output will be an image.""")
 
     input_group = parser.add_mutually_exclusive_group(required=True)
     input_group.add_argument("-c", "--camera", help="Integer representing the camera souce index", type=int, default=None)
     input_group.add_argument("-v", "--video", help="Path to the video file that will be processed.", type=str, default=None)
+    input_group.add_argument("-i", "--image", help="Path to the image file that will be processed.", type=str, default=None)
 
     parser.add_argument("cascade_source", help="Path to the trained haar cascade classifier source file.", type=str)
-    parser.add_argument("-o", "--output_file", help="Path where the processed video file will be stored.", type=str, default=None)
+    parser.add_argument("-o", "--output_file", help="Path where the processed video or image file will be stored.", type=str, default=None)
     parser.add_argument("-p", "--hide_processing", help="Shows a window while processing the video.", action="store_false")
     parser.add_argument("--variable_fps", help="Takes into account the processing time of the frame\
             to track the object, only recommended for camera input.", action="store_true")
@@ -171,21 +179,32 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    if args.output_file is not None:
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            temp_output_file = os.path.join(tmp_dir, "output_file")
+    if args.image is not None:
+        mainLoop(args.image,\
+                args.cascade_source,\
+                show_processing=False,\
+                output_file=args.output_file,\
+                variable_fps=True,\
+                save_fps=args.save_fps, show_fps=args.show_fps,\
+                save_img=True)
+    else:
+        if args.output_file is not None:
+            with tempfile.TemporaryDirectory() as tmp_dir:
+                temp_output_file = os.path.join(tmp_dir, "output_file")
+                mainLoop(args.video if args.video else args.camera,\
+                        args.cascade_source,\
+                        show_processing=args.hide_processing,\
+                        output_file=temp_output_file,\
+                        variable_fps=args.variable_fps,\
+                        save_fps=args.save_fps, show_fps=args.show_fps,\
+                        save_img=False)
+                os.makedirs(os.path.abspath(os.path.dirname(args.output_file)), exist_ok=True)
+                shutil.move(temp_output_file, args.output_file)
+        else:
             mainLoop(args.video if args.video else args.camera,\
                     args.cascade_source,\
                     show_processing=args.hide_processing,\
-                    output_file=temp_output_file,\
+                    output_file=args.output_file,\
                     variable_fps=args.variable_fps,\
-                    save_fps=args.save_fps, show_fps=args.show_fps)
-            os.makedirs(os.path.abspath(os.path.dirname(args.output_file)), exist_ok=True)
-            shutil.move(temp_output_file, args.output_file)
-    else:
-        mainLoop(args.video if args.video else args.camera,\
-                args.cascade_source,\
-                show_processing=args.hide_processing,\
-                output_file=args.output_file,\
-                variable_fps=args.variable_fps,\
-                save_fps=args.save_fps, show_fps=args.show_fps)
+                    save_fps=args.save_fps, show_fps=args.show_fps,\
+                    save_img=False)
