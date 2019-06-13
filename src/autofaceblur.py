@@ -82,7 +82,6 @@ def mainLoop(video_source, cascade_source, show_processing=True, output_file=Non
         frameFacesList = list()
         for rect in front_faces:
             (x, y, w, h) = rect
-            frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
             face = faceObject(rect)
             frameFacesList.append(face)
 
