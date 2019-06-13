@@ -6,3 +6,6 @@ __pycache__/
 
 # Vim
 *.swp
+
+# Videos
+*.avi
