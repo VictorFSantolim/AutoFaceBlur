@@ -1,8 +1,11 @@
 # Source https://pysource.com/2018/10/01/face-detection-using-haar-cascades-opencv-3-4-with-python-3-tutorial-37/
 
 # Python modules
+import os
 import time
+import shutil
 import argparse
+import tempfile
 
 # Third-party modules
 import cv2
@@ -169,9 +172,21 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    mainLoop(args.video if args.video else args.camera,\
-            args.cascade_source,\
-            show_processing=args.hide_processing,\
-            output_file=args.output_file,\
-            variable_fps=args.variable_fps,\
-            save_fps=args.save_fps, show_fps=args.show_fps)
+    if args.output_file is not None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            temp_output_file = os.path.join(tmp_dir, "output_file")
+            mainLoop(args.video if args.video else args.camera,\
+                    args.cascade_source,\
+                    show_processing=args.hide_processing,\
+                    output_file=temp_output_file,\
+                    variable_fps=args.variable_fps,\
+                    save_fps=args.save_fps, show_fps=args.show_fps)
+            os.makedirs(os.path.abspath(os.path.dirname(args.output_file)), exist_ok=True)
+            shutil.move(temp_output_file, args.output_file)
+    else:
+        mainLoop(args.video if args.video else args.camera,\
+                args.cascade_source,\
+                show_processing=args.hide_processing,\
+                output_file=args.output_file,\
+                variable_fps=args.variable_fps,\
+                save_fps=args.save_fps, show_fps=args.show_fps)
