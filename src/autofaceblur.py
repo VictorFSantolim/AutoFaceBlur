@@ -119,9 +119,9 @@ def mainLoop(video_source, cascade_source, show_processing=True, output_file=Non
             if save_fps:
                 out_frame = frame.copy()
                 if variable_fps:
-                    cv2.putText(out_frame, str(calculated_fps) ,(10,30), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(255,0,255),2,cv2.LINE_AA)
+                    cv2.putText(out_frame, str('%.1f' %calculated_fps) ,(10,30), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(255,0,255),2,cv2.LINE_AA)
                 else:
-                    cv2.putText(out_frame, str(fps) ,(10,30), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(255,0,255),2,cv2.LINE_AA)
+                    cv2.putText(out_frame, str('%.1f' %fps) ,(10,30), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(255,0,255),2,cv2.LINE_AA)
                 frame_out_writer.write(out_frame)
             else:
                 frame_out_writer.write(frame)
@@ -133,7 +133,7 @@ def mainLoop(video_source, cascade_source, show_processing=True, output_file=Non
         if show_processing:
             if show_fps:
                 # Shows the realtime fps
-                cv2.putText(frame, str(calculated_fps) ,(10,30), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(255,0,255),2,cv2.LINE_AA)
+                cv2.putText(frame, str('%.1f' %calculated_fps) ,(10,30), cv2.FONT_HERSHEY_SIMPLEX, 0.5,(255,0,255),2,cv2.LINE_AA)
 
             # Shows the frame with detected faces
             cv2.imshow("Frame", frame)
