@@ -62,6 +62,9 @@ def mainLoop(video_source, cascade_source, show_processing=True, output_file=Non
 
     # Initializes the object classifier
     cascade_classifier = cv2.CascadeClassifier("cascades/haarcascade_frontalface_default.xml")
+    if cascade_source is not None:
+        cascade_classifier = cv2.CascadeClassifier(cascade_source)
+
 
     # Initilizes video_writer
     frame_out_writer = None
