@@ -43,3 +43,9 @@ optional arguments:
                         output_file.
 
 ```
+
+## Sample output
+
+![Imgur](assets/women_blur.jpg)
+
+## References
