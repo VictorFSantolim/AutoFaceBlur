@@ -1,15 +1,17 @@
 # AutoFaceBlur
-Blur automático de faces humanas em vídeos. A ideia principal é executar o blur em tempo real com
-base em Cascades e possivelmente outras formas de rastreamento de _features_.
+Processes a video from a camera source or video file source, blurs a detected
+object in the image using a trained Haar cascade classifier while tracking
+that object to make sure all the frames are properly blurred. Made with real-time
+processing in mind.
 
 ---
 
-## Pré-requisitos
+## Requirements
 _Python 3_ com _NumPy_ e _OpenCV 3.1+_. 
 
 ---
 
-## Execução
+## Running
 ```
 usage: autofaceblur.py [-h] (-c CAMERA | -v VIDEO | -i IMAGE) [-o OUTPUT_FILE]
                        [-p] [--variable_fps] [--show_fps] [--save_fps]
