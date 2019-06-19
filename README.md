@@ -3,11 +3,9 @@ Processes a video from a camera source or video file source, blurs a detected
 object in the image using a trained Haar cascade classifier while tracking
 that object to make sure all the frames are properly blurred. Made with real-time
 processing in mind.
----
 
 ## Requirements
 _Python 3_ with _NumPy_ and _OpenCV 3.1+_. 
----
 
 ## Running
 ```
