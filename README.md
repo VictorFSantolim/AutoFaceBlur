@@ -48,7 +48,7 @@ $ python src/autofaceblur.py cascades/myCascade3.xml -v src_video_path -o blurre
 #### Required: One of the following
 `-c CAMERA` or `--camera CAMERA` select camera index CAMERA as the input source\
 `-v VIDEO` or `--video VIDEO` select path VIDEO as the video input source\
-`-i IMAGE` or `--image IMAGE` select path IMAGE as the image input source\
+`-i IMAGE` or `--image IMAGE` select path IMAGE as the image input source
 
 #### Optional
 `-s CASCADE` or `--cascade_source CASCADE` Defines CASCADE the trained Haar cascade classifier path. If the argument is absent, uses haarcascade_frontalface_default.xml.\
