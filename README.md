@@ -43,9 +43,24 @@ optional arguments:
                         output_file.
 
 ```
+## Usage examples
 
-## Sample output
+* Webcam input
+```
+>python autofaceblur.py ../cascades/haarcascade_frontalface_default.xml -c 0
+```
+
+* Image input and output
+```
+>python autofaceblur.py ../cascades/haarcascade_frontalface_default.xml -i ../assets/women.jpg -o ../assets/women_blur.jpg
+```
+
+## Sample outputs
 
 ![Imgur](assets/women_blur.jpg)
 
+
 ## References
+
+[OpenCV Haarascades](https://github.com/opencv/opencv/tree/master/data/haarcascades)
+[YOLOFace](https://github.com/sthanhng/yoloface)
