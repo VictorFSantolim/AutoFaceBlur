@@ -43,7 +43,7 @@ $ python src/autofaceblur.py cascades/myCascade3.xml -v src_video_path -o blurre
 
 ## Args and options
 
-`-h` or `--help` show the help message with all args and options and exit\
+`-h` or `--help` show the help message with all args and options and exit
 
 #### Required: One of the following
 `-c CAMERA` or `--camera CAMERA` select camera index CAMERA as the input source\
