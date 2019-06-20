@@ -34,7 +34,7 @@ $ python src/autofaceblur.py -i assets/women.jpg -o assets/women_blur.jpg
 ```
 * Video input and output, using the classifier we trained, and showing fps
 ```
-$ python src/autofaceblur.py cascades/myCascade3.xml -v src_video_path -o blurred_video_path --show_fps
+$ python src/autofaceblur.py -s cascades/myCascade3.xml -v src_video_path -o blurred_video_path --show_fps
 ```
 __To close the window, press ESC.__
 
