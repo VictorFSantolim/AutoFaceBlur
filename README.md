@@ -47,12 +47,12 @@ optional arguments:
 
 * Webcam input
 ```
->python autofaceblur.py ../cascades/haarcascade_frontalface_default.xml -c 0
+python autofaceblur.py ../cascades/haarcascade_frontalface_default.xml -c 0
 ```
 
 * Image input and output
 ```
->python autofaceblur.py ../cascades/haarcascade_frontalface_default.xml -i ../assets/women.jpg -o ../assets/women_blur.jpg
+python autofaceblur.py ../cascades/haarcascade_frontalface_default.xml -i ../assets/women.jpg -o ../assets/women_blur.jpg
 ```
 
 ## Sample outputs
@@ -62,5 +62,5 @@ optional arguments:
 
 ## References
 
-[OpenCV Haarascades](https://github.com/opencv/opencv/tree/master/data/haarcascades)
+[OpenCV Haarascades](https://github.com/opencv/opencv/tree/master/data/haarcascades)\
 [YOLOFace](https://github.com/sthanhng/yoloface)
