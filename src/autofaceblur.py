@@ -69,10 +69,9 @@ def mainLoop(video_source, cascade_source, show_processing=True, output_file=Non
     # Initilizes video_writer
     frame_out_writer = None
     if output_file is not None:
+        ret, frame = cap.read()
         if not save_img:
-            frame_out_writer = cv2.VideoWriter(output_file, \
-                    cv2.VideoWriter_fourcc('M','J','P','G'), \
-                    fps, (frame_width,frame_height))
+            frame_out_writer = cv2.VideoWriter(output_file, cv2.VideoWriter_fourcc('M','J','P','G'), fps, (frame_width,frame_height))
 
     # Timing start
     time_start = time.time()
@@ -193,7 +192,7 @@ if __name__ == "__main__":
     else:
         if args.output_file is not None:
             with tempfile.TemporaryDirectory() as tmp_dir:
-                temp_output_file = os.path.join(tmp_dir, "output_file")
+                temp_output_file = os.path.join(tmp_dir, args.output_file+".avi")
                 mainLoop(args.video if args.video else args.camera,\
                         args.cascade_source,\
                         show_processing=args.hide_processing,\
