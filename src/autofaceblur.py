@@ -42,41 +42,51 @@ def mainLoop(video_source, cascade_source, show_processing=True, output_file=Non
 
     show_fps -- If True shows the fps in the window if show_processing is also True.
     """
-    # Initializes the capture
-    cap = cv2.VideoCapture(video_source)
-
-    # Initializes the window
-    if show_processing:
-        cv2.namedWindow("Frame", cv2.WINDOW_NORMAL)
-
-    # Initializes the tracker
-    tracker = faceTracker()
-    
-    # Initializes the fps
-    fps = cap.get(cv2.CAP_PROP_FPS)
-    calculated_fps = fps
-
-    # Gets width and height
-    frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-
     # Initializes the object classifier
     cascade_classifier = cv2.CascadeClassifier("cascades/haarcascade_frontalface_default.xml")
     if cascade_source is not None:
         cascade_classifier = cv2.CascadeClassifier(cascade_source)
+    # Initializes the tracker
+    tracker = faceTracker()
+        
 
-
-    # Initilizes video_writer
+    frame = None
+    cap = None
+    ret = False
+    calculated_fps = 30
+    fps = 30
     frame_out_writer = None
-    if output_file is not None:
-        ret, frame = cap.read()
-        if not save_img:
-            frame_out_writer = cv2.VideoWriter(output_file, cv2.VideoWriter_fourcc('M','J','P','G'), fps, (frame_width,frame_height))
+    if not save_img:
+        # Initializes the capture
+        cap = cv2.VideoCapture(video_source)
+
+        # Initializes the window
+        if show_processing:
+            cv2.namedWindow("Frame", cv2.WINDOW_NORMAL)
+
+        # Initializes the fps
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        calculated_fps = fps
+
+        # Gets width and height
+        frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+        # Initilizes video_writer
+        if output_file is not None:
+            ret, frame = cap.read()
+            if not save_img:
+                frame_out_writer = cv2.VideoWriter(output_file, cv2.VideoWriter_fourcc('M','J','P','G'), fps, (frame_width,frame_height))
+
+        # Reads a frame
+        ret , frame = cap.read()
+    else:
+        frame = cv2.imread(video_source)
+        ret = True
+    
 
     # Timing start
     time_start = time.time()
-    # Reads a frame
-    ret , frame = cap.read()
     while ret:
         # Makes the frame gray scale (used for haar processing)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -147,11 +157,13 @@ def mainLoop(video_source, cascade_source, show_processing=True, output_file=Non
         
         # Timing start
         time_start = time.time()
-        # Reads a new frame
-        ret , frame = cap.read()
+        if not save_img:
+            # Reads a new frame
+            ret , frame = cap.read()
 
     # Releases the capture and closes the spawned windows
-    cap.release()
+    if not save_img:
+        cap.release()
     if show_processing:
         cv2.destroyAllWindows()
     if frame_out_writer is not None:
