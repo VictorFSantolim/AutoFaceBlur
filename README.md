@@ -1,64 +1,62 @@
 # AutoFaceBlur
-Processes a video from a camera source or video file source, blurs a detected
-object in the image using a trained Haar cascade classifier while tracking
+
+Processes a video or image from a camera source or file source, blurs a detected
+human face object in the image using a trained Haar cascade classifier while tracking
 that object to make sure all the frames are properly blurred. Made with real-time
 processing in mind.
 
 ## Requirements
 _Python 3_ with _NumPy_ and _OpenCV 3.1+_. 
 
-## Running
+## Installing
+
+- Install [Miniconda](https://docs.conda.io/en/latest/miniconda.html) for your OS
+	- On Windows, use Anaconda Powershell Prompt as admin
+	- On Linux and Mac OS, install the .sh file and use the regular bash
+- Install OpenCV
 ```
-usage: autofaceblur.py [-h] (-c CAMERA | -v VIDEO | -i IMAGE) [-o OUTPUT_FILE]
-                       [-p] [--variable_fps] [--show_fps] [--save_fps]
-                       cascade_source
-
-Processes a video from a camera source or video file source, blurs a detected
-object in the image using a trained Haar cascade classifier while tracking
-that object to make sure all the frames are properly blurred. Note that if the
-input is passed as a video or camera source the output will be a video, if it
-is an image the output will be an image.
-
-positional arguments:
-  cascade_source        Path to the trained haar cascade classifier source
-                        file.
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -c CAMERA, --camera CAMERA
-                        Integer representing the camera souce index
-  -v VIDEO, --video VIDEO
-                        Path to the video file that will be processed.
-  -i IMAGE, --image IMAGE
-                        Path to the image file that will be processed.
-  -o OUTPUT_FILE, --output_file OUTPUT_FILE
-                        Path where the processed video or image file will be
-                        stored.
-  -p, --hide_processing
-                        Shows a window while processing the video.
-  --variable_fps        Takes into account the processing time of the frame to
-                        track the object, only recommended for camera input.
-  --show_fps            Shows fps in the a window while processing the video.
-  --save_fps            Saves the video fps as it was captured to the video
-                        output_file.
-
+$ conda install -c conda-forge opencv
 ```
+- Finally clone the repository
+```
+$ git clone https://github.com/VictorFSantolim/AutoFaceBlur.git
+```
+
 ## Usage examples
 
 * Webcam input
 ```
-python autofaceblur.py ../cascades/haarcascade_frontalface_default.xml -c 0
+$ python src/autofaceblur.py -c 0
 ```
-
 * Image input and output
 ```
-python autofaceblur.py ../cascades/haarcascade_frontalface_default.xml -i ../assets/women.jpg -o ../assets/women_blur.jpg
+$ python src/autofaceblur.py -i assets/women.jpg -o assets/women_blur.jpg
+```
+* Video input and output, using the classifier we trained, and showing fps
+```
+$ python src/autofaceblur.py cascades/myCascade3.xml -v src_video_path -o blurred_video_path --show_fps
 ```
 
-## Sample outputs
+## Sample output
 
 ![Imgur](assets/women_blur.jpg)
 
+## Args and options
+
+`-h` or `--help` show the help message with all args and options and exit\
+
+#### Required: One of the following
+`-c CAMERA` or `--camera CAMERA` select camera index CAMERA as the input source\
+`-v VIDEO` or `--video VIDEO` select path VIDEO as the video input source\
+`-i IMAGE` or `--image IMAGE` select path IMAGE as the image input source\
+
+#### Optional
+`-s CASCADE` or `--cascade_source CASCADE` Defines CASCADE the trained Haar cascade classifier path. If the argument is absent, uses haarcascade_frontalface_default.xml.\
+`-o OUTPUT_FILE` or `--output_file OUTPUT_FILE` Enable output storing, saves the processed result to OUTPUT_FILE\
+`-p` or `--hide_processing` Runs processing in background, without displaying the frames being processed\
+`--variable_fps` Takes into account the processing time of the frame to track the object, only recommended for camera input.\
+`--show_fps` Shows fps in the a window while processing the video.\
+`--save_fps` Saves the video fps as it was captured to the video output_file.
 
 ## References
 
