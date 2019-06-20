@@ -171,7 +171,7 @@ if __name__ == "__main__":
     input_group.add_argument("-v", "--video", help="Path to the video file that will be processed.", type=str, default=None)
     input_group.add_argument("-i", "--image", help="Path to the image file that will be processed.", type=str, default=None)
 
-    parser.add_argument("cascade_source", help="Path to the trained haar cascade classifier source file.", type=str)
+    parser.add_argument("-s","--cascade_source", type=str, help="Path to the trained haar cascade classifier source file.", nargs='?', default="cascades/haarcascade_frontalface_default.xml")
     parser.add_argument("-o", "--output_file", help="Path where the processed video or image file will be stored.", type=str, default=None)
     parser.add_argument("-p", "--hide_processing", help="Shows a window while processing the video.", action="store_false")
     parser.add_argument("--variable_fps", help="Takes into account the processing time of the frame\
